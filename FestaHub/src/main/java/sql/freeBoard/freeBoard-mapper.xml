@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+
+	<!-- 일반게시글 총 갯수 조회용 쿼리문 -->
+	<entry key="selectListCount">   
+		   SELECT COUNT(*) AS COUNT
+		     FROM FREEBOARD
+		    WHERE FREE_STATUS='Y'
+	</entry>
+	
+	<!-- 제목검색 총 갯수 조회용 쿼리문 -->
+	<entry key="selectListCountTitle">   
+		   SELECT COUNT(*) AS COUNT
+		     FROM FREEBOARD
+		    WHERE FREE_STATUS='Y'
+		      AND FREE_TITLE LIKE ?
+	</entry>
+	
+	<!-- 내용검색 총 갯수 조회용 쿼리문 -->
+	<entry key="selectListCountContent">   
+		   SELECT COUNT(*) AS COUNT
+		     FROM FREEBOARD
+		    WHERE FREE_STATUS='Y'
+		      AND FREE_CONTENT LIKE ?
+	</entry>
+	
+	<!-- 닉네임검색 총 갯수 조회용 쿼리문 -->
+	<entry key="selectListCountWriter">   
+		   SELECT COUNT(*) AS COUNT
+		     FROM FREEBOARD
+		     JOIN USER_INFO USING (USER_NO)
+		    WHERE FREE_STATUS='Y'
+		      AND USER_NICKNAME LIKE ?
+	</entry>
+	
+
+	<!-- 일반게시글 목록 조회용 쿼리문 + 페이징 -->
+	<entry key="selectList">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+			    SELECT F.FREE_NO
+			          ,FREE_TITLE
+			          ,FREE_CONTENT
+			          ,FREE_DATE
+			          ,FREE_COUNT
+			          ,FREE_STATUS
+			          ,F.USER_NO
+			          ,USER_NICKNAME
+			          ,NVL(COMMENT_COUNT,0) AS COMMENT_COUNT
+			          ,NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			      FROM FREEBOARD F
+			      JOIN USER_INFO U ON(F.USER_NO=U.USER_NO)
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                                  FROM FREEBOARD_COMMENT C
+                                 WHERE FREE_COMM_STATUS='Y'
+                                 GROUP BY FREE_NO
+                            ) C ON(C.FREE_NO=F.FREE_NO)--조인
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                                  FROM FREEBOARD_LIKE L
+                                 GROUP BY FREE_NO
+                            ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+			     WHERE FREE_STATUS='Y'
+            
+			      ORDER BY FREE_NO DESC   
+		      ) A
+		    )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+		<!-- 일반게시글 목록 조회용 쿼리문 + 페이징 -->
+	<entry key="selectListAsc">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+			    SELECT F.FREE_NO
+			          ,FREE_TITLE
+			          ,FREE_CONTENT
+			          ,FREE_DATE
+			          ,FREE_COUNT
+			          ,FREE_STATUS
+			          ,F.USER_NO
+			          ,USER_NICKNAME
+			          ,NVL(COMMENT_COUNT,0) AS COMMENT_COUNT
+			          ,NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			      FROM FREEBOARD F
+			      JOIN USER_INFO U ON(F.USER_NO=U.USER_NO)
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                                  FROM FREEBOARD_COMMENT C
+                                 WHERE FREE_COMM_STATUS='Y'
+                                 GROUP BY FREE_NO
+                            ) C ON(C.FREE_NO=F.FREE_NO)--조인
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                                  FROM FREEBOARD_LIKE L
+                                 GROUP BY FREE_NO
+                            ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+                 
+			     WHERE FREE_STATUS='Y'
+            
+			      ORDER BY FREE_NO ASC   
+		      ) A
+		    )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+	<!-- 자유게시판 게시글 작성 쿼리문  -->
+	<entry key="insertFreeBoard">
+		INSERT INTO FREEBOARD (FREE_NO
+							  ,FREE_TITLE
+							  ,FREE_CONTENT
+							  ,USER_NO)
+					    VALUES(SEQ_FREE_NO.NEXTVAL
+					    	  ,?
+					    	  ,?
+					    	  ,?)							  
+	
+	</entry>
+	
+	
+
+	
+	
+	<!-- 조회수 증가용 쿼리문 -->
+	<entry key="increaseCount">
+		UPDATE FREEBOARD
+		   SET FREE_COUNT = FREE_COUNT+1
+		 WHERE FREE_NO = ?
+		   AND FREE_STATUS='Y'
+
+	</entry>
+	
+	<!-- 자유게시판 상세조회용 쿼리문 -->
+	<entry key="selectFreeBoard">
+		SELECT F.FREE_NO,
+			   FREE_TITLE,
+			   FREE_CONTENT,
+			   FREE_DATE,
+			   FREE_COUNT,
+			   USER_NICKNAME,
+			   F.USER_NO,
+			   NVL(COMMENT_COUNT,0) AS COMMENT_COUNT,
+			   NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			   
+	     FROM FREEBOARD F
+	     JOIN USER_INFO U ON(F.USER_NO=U.USER_NO)
+	     LEFT JOIN (
+                       SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                         FROM FREEBOARD_COMMENT C
+                        WHERE FREE_COMM_STATUS='Y'
+                        GROUP BY FREE_NO
+                   ) C ON(C.FREE_NO=F.FREE_NO)--조인
+		 LEFT JOIN (
+                        SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                          FROM FREEBOARD_LIKE L
+                         GROUP BY FREE_NO
+                    ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+	    WHERE F.FREE_NO=?
+        AND F.FREE_STATUS='Y'       
+	</entry>
+	
+	
+	
+	<!-- 자유게시판 첨부파일 조회용 쿼리문 -->
+	<entry key="selectFreeBoardFile">
+		SELECT FREE_FILE_NO
+		      ,FREE_FILE_NAME
+		      ,FREE_FILE_RENAME
+		      ,FREE_FILE_PATH
+		      ,FREE_NO
+		 FROM FREEBOARD_FILE
+		WHERE FREE_NO = ?
+		  AND FREE_FILE_STATUS='Y'
+	
+	</entry>
+	
+	
+	<!-- 자유게시판 게시글 삭제(update) 쿼리문 -->
+	<entry key="deleteFreeBoard">
+		UPDATE FREEBOARD
+		   SET FREE_STATUS='N'
+		 WHERE FREE_NO=?
+		   AND USER_NO=?
+		   AND FREE_STATUS='Y'
+
+	</entry>
+	
+
+	
+	
+	<entry key="insertComment">
+		INSERT INTO FREEBOARD_COMMENT (FREE_COMM_NO
+		 							  ,FREE_COMM_CONTENT
+		 							  ,FREE_NO
+		 							  ,USER_NO)
+		 					   VALUES (SEQ_FREE_COMM_NO.NEXTVAL
+		 					          ,?
+		 					          ,?
+		 					          ,?)
+	</entry>
+	
+	
+	<!-- 댓글조회용 쿼리문 -->
+	<entry key="selectCommentList">
+		SELECT FREE_COMM_NO,
+		       FREE_COMM_CONTENT,
+		       FREE_COMM_DATE,
+		       FREE_NO,
+		       USER_NO,
+		       USER_NICKNAME
+		       
+		      
+		 FROM FREEBOARD_COMMENT
+		 JOIN USER_INFO USING(USER_NO)
+		WHERE FREE_NO=?
+		  AND FREE_COMM_STATUS='Y'
+		ORDER BY FREE_COMM_NO ASC
+		
+	</entry>
+	
+	<!-- 댓글 삭제용(UPDATE)쿼리문 -->
+	<entry key="deleteComment">
+		UPDATE FREEBOARD_COMMENT
+		   SET FREE_COMM_STATUS='N'
+		 WHERE FREE_COMM_NO=?
+		   AND FREE_COMM_STATUS='Y'
+	</entry>
+	
+	
+	<!--댓글 한 개 조회용 쿼리문 -->
+	<entry key="selectFreeBoardComment">
+		SELECT FREE_COMM_NO,
+		       FREE_COMM_CONTENT,
+		       USER_NO
+		  FROM FREEBOARD_COMMENT
+		 WHERE FREE_COMM_NO=?
+		   AND FREE_COMM_STATUS = 'Y'
+				
+	
+	</entry>
+	
+	
+	<!-- 댓글 수정용 쿼리문 -->
+	<entry key="updateFreeBoardComment">
+		UPDATE FREEBOARD_COMMENT
+		   SET FREE_COMM_CONTENT=?
+		 WHERE FREE_COMM_NO=?
+		   AND FREE_COMM_STATUS='Y'
+	
+	</entry>
+	
+	
+	<!-- 좋아요 확인용 쿼리문 -->
+	<entry key="selectLike">
+		SELECT USER_NO
+		  FROM FREEBOARD_LIKE
+		 WHERE FREE_NO = ?
+		   AND USER_NO = ?
+	</entry>
+	
+	
+	<!-- 좋아요 추가 쿼리문 -->
+	<entry key="insertLike">	
+		INSERT INTO FREEBOARD_LIKE (USER_NO,FREE_NO)
+		                    VALUES (?,?)
+	</entry>
+	
+	
+	
+	<!-- 좋아요 삭제 쿼리문 -->
+	<entry key="deleteLike">	
+		DELETE FREEBOARD_LIKE
+		 WHERE FREE_NO=?
+		   AND USER_NO=?
+	</entry>
+	
+	
+	
+	
+	<!-- 총 좋아요수 조회 쿼리문 -->
+	<entry key="selectLikeCount">
+		SELECT COUNT(USER_NO) LIKE_COUNT
+		  FROM FREEBOARD_LIKE
+		 WHERE FREE_NO = ?
+		 GROUP BY FREE_NO
+	</entry>
+	
+	
+	
+	<!-- 제목 검색 조회용 쿼리문 + 페이징 -->
+	<entry key="selectListTitle">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+			    SELECT F.FREE_NO
+			          ,FREE_TITLE
+			          ,FREE_CONTENT
+			          ,FREE_DATE
+			          ,FREE_COUNT
+			          ,FREE_STATUS
+			          ,F.USER_NO
+			          ,USER_NICKNAME
+			          ,NVL(COMMENT_COUNT,0) AS COMMENT_COUNT
+			          ,NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			      FROM FREEBOARD F
+			      JOIN USER_INFO U ON(F.USER_NO=U.USER_NO)
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                                  FROM FREEBOARD_COMMENT C
+                                 WHERE FREE_COMM_STATUS='Y'
+                                 GROUP BY FREE_NO
+                            ) C ON(C.FREE_NO=F.FREE_NO)--조인
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                                  FROM FREEBOARD_LIKE L
+                                 GROUP BY FREE_NO
+                            ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+			     WHERE FREE_STATUS='Y'
+			       AND FREE_TITLE LIKE ?
+            
+			      ORDER BY FREE_NO DESC
+		      ) A
+		    )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+	
+	
+	<!-- 내용 검색 조회용 쿼리문 + 페이징 -->
+	<entry key="selectListContent">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+			    SELECT F.FREE_NO
+			          ,FREE_TITLE
+			          ,FREE_CONTENT
+			          ,FREE_DATE
+			          ,FREE_COUNT
+			          ,FREE_STATUS
+			          ,F.USER_NO
+			          ,USER_NICKNAME
+			          ,NVL(COMMENT_COUNT,0) AS COMMENT_COUNT
+			          ,NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			      FROM FREEBOARD F
+			      JOIN USER_INFO U ON(F.USER_NO=U.USER_NO)
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                                  FROM FREEBOARD_COMMENT C
+                                 WHERE FREE_COMM_STATUS='Y'
+                                 GROUP BY FREE_NO
+                            ) C ON(C.FREE_NO=F.FREE_NO)--조인
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                                  FROM FREEBOARD_LIKE L
+                                 GROUP BY FREE_NO
+                            ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+			     WHERE FREE_STATUS='Y'
+			       AND FREE_CONTENT LIKE ?
+            
+			      ORDER BY FREE_NO  DESC   
+		      ) A
+		    )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+		<!-- 내용 검색 조회용 쿼리문 + 페이징 -->
+	<entry key="selectListWriter">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+			    SELECT F.FREE_NO
+			          ,FREE_TITLE
+			          ,FREE_CONTENT
+			          ,FREE_DATE
+			          ,FREE_COUNT
+			          ,FREE_STATUS
+			          ,F.USER_NO
+			          ,USER_NICKNAME
+			          ,NVL(COMMENT_COUNT,0) AS COMMENT_COUNT
+			          ,NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			      FROM FREEBOARD F
+			      JOIN USER_INFO U ON(F.USER_NO=U.USER_NO)
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                                  FROM FREEBOARD_COMMENT C
+                                 WHERE FREE_COMM_STATUS='Y'
+                                 GROUP BY FREE_NO
+                            ) C ON(C.FREE_NO=F.FREE_NO)--조인
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                                  FROM FREEBOARD_LIKE L
+                                 GROUP BY FREE_NO
+                            ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+			     WHERE FREE_STATUS='Y'
+			       AND USER_NICKNAME LIKE ?
+            
+			      ORDER BY FREE_NO  DESC
+		      ) A
+		    )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+	
+	
+		<!-- 제목 오래된순 검색 조회용 쿼리문 + 페이징 -->
+	<entry key="selectListAscTitle">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+			    SELECT F.FREE_NO
+			          ,FREE_TITLE
+			          ,FREE_CONTENT
+			          ,FREE_DATE
+			          ,FREE_COUNT
+			          ,FREE_STATUS
+			          ,F.USER_NO
+			          ,USER_NICKNAME
+			          ,NVL(COMMENT_COUNT,0) AS COMMENT_COUNT
+			          ,NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			      FROM FREEBOARD F
+			      JOIN USER_INFO U ON(F.USER_NO=U.USER_NO)
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                                  FROM FREEBOARD_COMMENT C
+                                 WHERE FREE_COMM_STATUS='Y'
+                                 GROUP BY FREE_NO
+                            ) C ON(C.FREE_NO=F.FREE_NO)--조인
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                                  FROM FREEBOARD_LIKE L
+                                 GROUP BY FREE_NO
+                            ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+			     WHERE FREE_STATUS='Y'
+			       AND FREE_TITLE LIKE ?
+            
+			      ORDER BY FREE_NO ASC
+		      ) A
+		    )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+	
+	
+	<!-- 내용 오래된순 검색 조회용 쿼리문 + 페이징 -->
+	<entry key="selectListAscContent">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+			    SELECT F.FREE_NO
+			          ,FREE_TITLE
+			          ,FREE_CONTENT
+			          ,FREE_DATE
+			          ,FREE_COUNT
+			          ,FREE_STATUS
+			          ,F.USER_NO
+			          ,USER_NICKNAME
+			          ,NVL(COMMENT_COUNT,0) AS COMMENT_COUNT
+			          ,NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			      FROM FREEBOARD F
+			      JOIN USER_INFO U ON(F.USER_NO=U.USER_NO)
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                                  FROM FREEBOARD_COMMENT C
+                                 WHERE FREE_COMM_STATUS='Y'
+                                 GROUP BY FREE_NO
+                            ) C ON(C.FREE_NO=F.FREE_NO)--조인
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                                  FROM FREEBOARD_LIKE L
+                                 GROUP BY FREE_NO
+                            ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+			     WHERE FREE_STATUS='Y'
+			       AND FREE_CONTENT LIKE ?
+            
+			      ORDER BY FREE_NO ASC   
+		      ) A
+		    )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+		<!-- 내용 오래된순 검색 조회용 쿼리문 + 페이징 -->
+	<entry key="selectListAscWriter">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+			    SELECT F.FREE_NO
+			          ,FREE_TITLE
+			          ,FREE_CONTENT
+			          ,FREE_DATE
+			          ,FREE_COUNT
+			          ,FREE_STATUS
+			          ,F.USER_NO
+			          ,USER_NICKNAME
+			          ,NVL(COMMENT_COUNT,0) AS COMMENT_COUNT
+			          ,NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			      FROM FREEBOARD F
+			      JOIN USER_INFO U ON(F.USER_NO=U.USER_NO)
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                                  FROM FREEBOARD_COMMENT C
+                                 WHERE FREE_COMM_STATUS='Y'
+                                 GROUP BY FREE_NO
+                            ) C ON(C.FREE_NO=F.FREE_NO)--조인
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                                  FROM FREEBOARD_LIKE L
+                                 GROUP BY FREE_NO
+                            ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+			     WHERE FREE_STATUS='Y'
+			       AND USER_NICKNAME LIKE ?
+            
+			      ORDER BY FREE_NO  ASC
+		      ) A
+		    )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+	
+	
+	
+	///////////////////////////////////////////////////////////////////////////
+	
+	
+		<!-- 자유게시판 게시글 첨부파일 업로드 쿼리문 -->
+	<entry key="insertFreeBoardFileList">
+		INSERT INTO FREEBOARD_FILE(FREE_FILE_NO
+				                          ,FREE_FILE_NAME
+				                          ,FREE_FILE_RENAME
+				                          ,FREE_FILE_PATH
+				                          ,FREE_NO)
+				                    VALUES(SEQ_FREE_FILE_NO.NEXTVAL
+				                          ,?
+				                          ,?
+				                          ,?
+				                          ,SEQ_FREE_NO.CURRVAL)
+	</entry>
+	
+	
+	
+	/////////////////////////////////////////////////////////////////////////////
+	
+		<!-- 1-1 자유게시판 업데이트 (게시글 업데이트) -->
+	<entry key="updateFreeBoard">
+		
+		     UPDATE FREEBOARD 
+			    SET FREE_TITLE=?
+				   ,FREE_CONTENT=?
+			  WHERE FREE_NO=?
+			  	AND FREE_STATUS='Y' 
+
+	</entry>
+	
+	<!-- 1-2 자유게시판 업데이트 (첨부파일 업데이트) -->
+	<entry key="updateFreeBoardFileS">
+	
+			 UPDATE FREEBOARD_FILE
+		        SET FREE_FILE_NAME=?
+		           ,FREE_FILE_RENAME=?
+		      WHERE FREE_FILE_NO=?
+		        AND FREE_FILE_STATUS = 'Y'
+		           
+	</entry>
+	
+	
+	<!-- 1-3 자유게시판 수정용 쿼리문 (새로운 첨부파일 insert) -->
+	
+	<entry key="insertNewFreeBoardFiles">
+		
+		INSERT INTO FREEBOARD_FILE (FREE_FILE_NO
+								   ,FREE_FILE_NAME
+								   ,FREE_FILE_RENAME
+								   ,FREE_FILE_PATH
+							     	,FREE_NO)
+							VALUES (SEQ_FREE_FILE_NO.NEXTVAL
+							       ,?
+							       ,?
+							       ,?
+							       ,?)
+							
+		
+		
+	</entry>
+	
+	
+	<!-- 첨부파일 수정시, 삭제용 쿼리문(UPDATE) -->
+	<entry key="deleteFreeBoardFiles">
+	
+		DELETE FREEBOARD_FILE
+		 WHERE FREE_FILE_NO = ?
+ 
+	</entry>
+	
+	
+	
+	<entry key="adminSelctList">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+			    SELECT F.FREE_NO
+			          ,FREE_TITLE
+			          ,FREE_CONTENT
+			          ,FREE_DATE
+			          ,FREE_COUNT
+			          ,FREE_STATUS
+			          ,USER_NO
+			          ,NVL(COMMENT_COUNT,0) AS COMMENT_COUNT
+			          ,NVL(LIKE_COUNT,0) AS LIKE_COUNT
+			          ,NVL(FILE_COUNT,0) AS FILE_COUNT
+			      FROM FREEBOARD F
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO)AS COMMENT_COUNT
+                                  FROM FREEBOARD_COMMENT C
+                                 WHERE FREE_COMM_STATUS='Y'
+                                 GROUP BY FREE_NO
+                            ) C ON(C.FREE_NO=F.FREE_NO)--조인
+			      LEFT JOIN (
+                                SELECT FREE_NO,COUNT(USER_NO) AS "LIKE_COUNT"
+                                  FROM FREEBOARD_LIKE L
+                                 GROUP BY FREE_NO
+                            ) L ON(F.FREE_NO= L.FREE_NO)    -- 조인
+				  LEFT JOIN (
+				  			    SELECT FREE_NO,COUNT(FREE_FILE_NO) AS "FILE_COUNT"
+				  			      FROM FREEBOARD_FILE F_FILE
+				  			     GROUP BY FREE_NO
+				  			) F_FILE ON(F.FREE_NO = F_FILE.FREE_NO)   -- 조인
+				  
+			      ORDER BY FREE_NO DESC   
+		      ) A
+		    )
+		   WHERE RNUM BETWEEN ? AND ? 
+	</entry>
+	
+	<!-- 관리자 전용 게시글 삭제용 쿼리문 -->
+	<entry key="adminDeleteFreeBoard">
+		
+		DELETE FROM FREEBOARD
+		 WHERE FREE_NO = ?
+		
+	</entry>
+	
+	<!-- 관리자 전용 게시글 삭제 -댓글 삭제 -->
+	<entry key="adminDeleteFreeBoardComment">
+		DELETE FROM FREEBOARD_COMMENT
+		 WHERE FREE_NO = ?
+	</entry>
+	
+	<!-- 관리자 게시글 삭제 - 좋아요 삭제  -->
+	<entry key=" adminDeleteFreeBoardLike">
+		DELETE FROM FREEBOARD_LIKE
+		WHERE FREE_NO = ?
+	</entry>
+	
+	
+	<!-- 관리자 게시글 삭제 - 파일 삭제 -->
+	<entry key="adminDeleteFreeBoardFile">
+		DELETE FROM FREEBOARD_FILE
+		WHERE FREE_NO = ?
+	</entry>
+	
+</properties>
+
+
+
+

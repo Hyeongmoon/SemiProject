@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<!-- 공연정보 총 갯수 조회용 쿼리문 -->
+	<entry key="selectListCount">
+		SELECT COUNT(*) AS COUNT
+		  FROM FESTIVAL
+		 WHERE FES_STATUS = 'Y'
+	</entry>
+	
+	<!-- 공연정보 목록 조회용 + 댓글카운트 쿼리문 -->
+	<entry key="selectList">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+		        SELECT F.FES_NO
+		             , F.FES_TITLE
+		             , F.FES_DAY
+		             , F.FES_ADDRESS
+		             , F.FES_DATE
+		             , F.FES_COUNT
+		             , UI.USER_NICKNAME
+		             , FI.FES_IMG_PATH || FI.FES_IMG_RENAME AS "TITLEIMG"
+		             , (SELECT COUNT(*) 
+		                  FROM FESTIVAL_COMMENT FC 
+		                 WHERE FC.FES_NO = F.FES_NO 
+		                   AND FC.FES_COMM_STATUS = 'Y') AS "COMM_COUNT"
+		             , (SELECT COUNT(*) 
+		                  FROM FESTIVAL_LIKE 
+		                 WHERE FES_NO = F.FES_NO) AS "LIKE_COUNT"
+		             , (SELECT COUNT(*) 
+		                  FROM FESTIVAL_LIKE 
+		                 WHERE FES_NO = F.FES_NO 
+		                   AND USER_NO = ?) AS "IS_LIKED"
+		          FROM FESTIVAL F
+		          JOIN USER_INFO UI ON F.USER_NO = UI.USER_NO
+		          LEFT JOIN FESTIVAL_IMAGE FI ON F.FES_NO = FI.FES_NO 
+		                                     AND FI.FES_IMG_STATUS = 'Y'
+		                                     AND FI.FES_IMG_THUMB = 'Y'
+		         WHERE F.FES_STATUS = 'Y'
+		         ORDER BY F.FES_NO DESC
+		      ) A
+		  )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<!-- 공연정보 조회수 증가용 쿼리문 -->
+	<entry key="increaseCount">
+		UPDATE FESTIVAL
+		   SET FES_COUNT = FES_COUNT + 1
+		 WHERE FES_NO = ?
+		   AND FES_STATUS = 'Y'	
+	</entry>
+	
+	<!-- 공연정보 상세조회용 쿼리문 -->
+	<entry key="selectFes">
+		SELECT FES_NO
+		     , FES_TITLE
+		     , FES_CONTENT
+		     , FES_DAY
+		     , FES_ADDRESS
+		     , FES_DATE
+		     , FES_COUNT
+		     , USER_NICKNAME
+		     , USER_ID
+		  FROM FESTIVAL
+		  JOIN USER_INFO USING (USER_NO)
+		 WHERE FES_NO = ?
+		   AND FES_STATUS = 'Y'
+	</entry>
+	
+	<!-- 공연정보 이미지 상세조회용 쿼리문 -->
+	<entry key="selectImg">
+		SELECT FES_IMG_NO
+		     , FES_IMG_NAME
+		     , FES_IMG_RENAME
+		     , FES_IMG_PATH
+		     , FES_IMG_THUMB
+		  FROM FESTIVAL_IMAGE
+		 WHERE FES_NO = ?
+	       AND FES_IMG_STATUS = 'Y'
+	</entry>
+	
+	<!-- 공연정보 등록용 쿼리문 -->
+	<entry key="insertFes">
+		INSERT INTO FESTIVAL(FES_NO
+		                   , FES_TITLE
+		                   , FES_CONTENT
+		                   , FES_DAY
+		                   , FES_ADDRESS
+		                   , USER_NO)
+		              VALUES(SEQ_FES_NO.NEXTVAL
+		                   , ?
+		                   , ?
+		                   , ?
+		                   , ?
+		                   , ?)
+	</entry>
+                
+	<!-- 첨부이미지 등록용 쿼리문 -->
+	<entry key="insertImgList">
+		INSERT INTO FESTIVAL_IMAGE(FES_IMG_NO
+			                     , FES_IMG_NAME
+			                     , FES_IMG_RENAME
+			                     , FES_IMG_PATH
+			                     , FES_IMG_THUMB
+			                     , FES_NO)
+			                VALUES(SEQ_FES_IMG_NO.NEXTVAL
+			                     , ?
+			                     , ?
+			                     , ?
+			                     , ?
+			                     , SEQ_FES_NO.CURRVAL)
+	</entry>
+	
+	<!-- 공연정보 삭제용 쿼리문 -->
+	<entry key="deleteFes">
+		UPDATE FESTIVAL
+		   SET FES_STATUS = 'N'
+		 WHERE FES_NO = ?
+		   AND FES_STATUS = 'Y'
+	</entry>
+	
+	<!-- 공연정보 수정용 쿼리문 -->
+	<entry key="updateFes">
+		UPDATE FESTIVAL
+		   SET FES_TITLE = ?
+		     , FES_CONTENT = ?
+		     , FES_DAY = ?
+		     , FES_ADDRESS = ?
+		 WHERE FES_NO = ?
+		   AND FES_STATUS = 'Y'
+	</entry>
+	
+	<!-- 첨부이미지 수정용 쿼리문 -->
+	<entry key="updateImgList">
+		INSERT INTO FESTIVAL_IMAGE(FES_IMG_NO
+		                         , FES_IMG_NAME
+		                         , FES_IMG_RENAME
+		                         , FES_IMG_PATH
+		                         , FES_IMG_THUMB
+		                         , FES_NO)
+		                    VALUES(SEQ_FES_IMG_NO.NEXTVAL
+		                         , ?
+		                         , ?
+		                         , ?
+		                         , ?
+		                         , ?)
+	</entry>
+	
+	<!-- 기존첨부이미지 삭제용 쿼리문 -->
+	<entry key="deleteImgList">
+		UPDATE FESTIVAL_IMAGE
+		   SET FES_IMG_STATUS = 'N'
+		 WHERE FES_IMG_NO = ?
+		   AND FES_IMG_STATUS = 'Y'
+	</entry>
+	
+	<!-- 댓글 작성용 쿼리문 -->
+	<entry key="insertComm">
+		INSERT INTO FESTIVAL_COMMENT(FES_COMM_NO
+		                            , FES_COMM_CONTENT
+		                            , FES_NO
+		                            , USER_NO)
+		                       VALUES(SEQ_FES_COMM_NO.NEXTVAL
+		                            , ?
+		                            , ?
+		                            , ?)
+	</entry>
+	
+	<!-- 댓글리스트 조회용 쿼리문 -->
+	<entry key="selectCommList">
+		SELECT FES_COMM_NO
+		     , FES_COMM_CONTENT
+		     , FES_COMM_DATE
+		     , USER_NICKNAME
+		     , USER_ID
+		  FROM FESTIVAL_COMMENT
+		  JOIN USER_INFO USING (USER_NO)
+		 WHERE FES_NO = ?
+		   AND FES_COMM_STATUS = 'Y'
+		 ORDER BY FES_COMM_NO DESC
+	</entry>
+	
+	<!-- 댓글 수정용 쿼리문 -->
+	<entry key="updateComm">
+		UPDATE FESTIVAL_COMMENT
+		   SET FES_COMM_CONTENT = ? 
+		 WHERE FES_COMM_NO = ?
+ 	</entry>
+ 
+	<!-- 댓글 삭제용 쿼리문 -->
+	<entry key="deleteComm">
+		UPDATE FESTIVAL_COMMENT 
+		   SET FES_COMM_STATUS = 'N' 
+		 WHERE FES_COMM_NO = ?
+		   AND FES_COMM_STATUS = 'Y'
+	</entry>
+	
+	<!-- 좋아요 카운트 쿼리문 -->
+	<entry key="selectLikeInfo">
+		SELECT 
+		  COUNT(CASE WHEN USER_NO = ? THEN 1 END) AS "IS_LIKED", 
+		  COUNT(USER_NO) AS "LIKE_COUNT" 
+		FROM FESTIVAL_LIKE 
+		WHERE FES_NO = ?
+	</entry>
+	
+	<!-- 좋아요 추가용 쿼리문 -->
+	<entry key="likeFes">
+		INSERT INTO FESTIVAL_LIKE (FES_NO, 
+		                          USER_NO)
+		                   VALUES (?,
+		                           ?)
+	</entry>
+	
+	<!-- 좋아요 취소용 쿼리문 -->
+	<entry key="unlikeFes">
+		DELETE
+		  FROM FESTIVAL_LIKE
+		 WHERE FES_NO = ?
+		   AND USER_NO = ?
+	</entry>
+	
+	<!-- 이전글 조회용 쿼리문 -->
+	<entry key="prevFes">
+    	<![CDATA[
+			SELECT FES_NO
+			     , FES_TITLE
+			     , FES_CONTENT
+			     , FES_DAY
+			     , FES_ADDRESS
+			     , FES_DATE
+			     , FES_COUNT
+			     , USER_NICKNAME
+			     , USER_ID  
+			  FROM (
+			        SELECT * 
+			          FROM FESTIVAL 
+			         WHERE FES_NO < ? 
+			           AND FES_STATUS = 'Y' 
+			         ORDER BY FES_NO DESC
+			       )
+			  JOIN USER_INFO USING (USER_NO)
+			 WHERE ROWNUM = 1
+		]]>
+	</entry>
+	
+	<!-- 다음글 조회용 쿼리문 -->
+	<entry key="nextFes">
+		SELECT FES_NO
+		     , FES_TITLE
+		     , FES_CONTENT
+		     , FES_DAY
+		     , FES_ADDRESS
+		     , FES_DATE
+		     , FES_COUNT
+		     , USER_NICKNAME
+		     , USER_ID 
+		  FROM (
+		        SELECT * 
+		          FROM FESTIVAL 
+		         WHERE FES_NO > ?
+		           AND FES_STATUS = 'Y' 
+		         ORDER BY FES_NO ASC
+		       )
+		  JOIN USER_INFO USING (USER_NO)
+		 WHERE ROWNUM = 1
+	</entry>
+	
+	<!-- 관리자 페이지 리스트 조회용 -->
+	<entry key="adminSelectList">
+        SELECT F.FES_NO
+             , F.FES_TITLE
+             , F.FES_CONTENT
+             , F.FES_DAY
+             , F.FES_ADDRESS
+             , F.FES_DATE
+             , F.FES_COUNT
+             , F.FES_STATUS
+             , UI.USER_ID
+             , UI.USER_NICKNAME
+             , FI.FES_IMG_PATH || FI.FES_IMG_RENAME AS "TITLEIMG"
+             , (SELECT COUNT(*) 
+                  FROM FESTIVAL_COMMENT FC 
+                 WHERE FC.FES_NO = F.FES_NO 
+                   AND FC.FES_COMM_STATUS = 'Y') AS "COMM_COUNT"
+             , (SELECT COUNT(*) 
+                  FROM FESTIVAL_LIKE 
+                 WHERE FES_NO = F.FES_NO) AS "LIKE_COUNT"
+             , (SELECT COUNT(*) 
+                  FROM FESTIVAL_LIKE 
+                 WHERE FES_NO = F.FES_NO 
+                   AND USER_NO = ?) AS "IS_LIKED"
+          FROM FESTIVAL F
+          JOIN USER_INFO UI ON F.USER_NO = UI.USER_NO
+          LEFT JOIN FESTIVAL_IMAGE FI ON F.FES_NO = FI.FES_NO
+          							 AND FI.FES_IMG_THUMB = 'Y'
+         ORDER BY F.FES_NO DESC
+	</entry>
+	
+	<!-- 관리자페이지 첨부이미지조회용 -->
+	<entry key="getAdminImgList">
+		SELECT FES_IMG_NO
+		     , FES_IMG_NAME
+		     , FES_IMG_RENAME
+		     , FES_IMG_PATH
+		     , FES_IMG_THUMB
+		     , FES_IMG_STATUS
+		  FROM FESTIVAL_IMAGE
+		 WHERE FES_NO = ?
+ 	</entry>
+ 	
+ 	<!-- 관리자페이지 게시글 상태 전환용 -->
+ 	<entry key="toggleStatus">
+		UPDATE FESTIVAL 
+		   SET FES_STATUS = ? 
+		 WHERE FES_NO = ?
+ 	</entry>
+ 	
+ 	<!-- 게시글 이미지 삭제용 -->
+ 	<entry key="deleteImg">
+		UPDATE FESTIVAL_IMAGE
+		   SET FES_IMG_STATUS = 'N' 
+		 WHERE FES_IMG_NO = ?
+	</entry>
+	
+	<!-- 관리자페이지 게시글 삭제용 -->
+	<entry key="deleteTable">
+		DELETE 
+		  FROM FESTIVAL
+		 WHERE FES_NO = ?
+	</entry>
+</properties>

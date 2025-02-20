@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구글차트 사용법</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> <!-- 구글차트 api 라이브러리 연동 (cdn) -->
+    <style>
+        .wrap {
+            width : 1200px;
+            margin : auto;
+        }
+        #chart_div1 { width : 500px; }
+        #chart_div2 { width : 500px; }
+        #chart_div3 { width : 500px; }
+        #chart_div4 { width : 500px; }
+    </style>
+</head>
+<body>
+
+    <!--
+        * 공식 사이트 (개발자문서)
+        https://developers.google.com/chart/interactive/docs/gallery?hl=ko
+    -->
+
+    <div class="wrap">
+        <h1>가로막대그래프</h1>
+        <div id="chart_div1"></div>
+        <hr>
+
+        <h1>세로막대그래프</h1>
+        <div id="chart_div2"></div>
+        <hr>
+        
+        <h1>파이그래프</h1>
+        <div id="chart_div3"></div>
+        <hr>
+
+        <h1>선그래프</h1>
+        <div id="chart_div4"></div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // ----- 가로막대그래프 그리기 -----
+            google.charts.load('current', {packages: ['corechart', 'bar']});
+            google.charts.setOnLoadCallback(drawBar1);
+
+            function drawBar1() {
+                // 그래프 상에 표현할 데이터
+                var data = google.visualization.arrayToDataTable([
+                    ['카테고리', '판매수량',],
+                    ['테이블', 231],
+                    ['의자', 175],
+                    ['커튼', 31],
+                    ['조명', 379],
+                    ['러그', 26]
+                ]);
+
+                // 그래프 그리기 옵션
+                var options = {
+                    title: '카테고리별 판매 수량',
+                    chartArea: {width: '50%'},
+                    hAxis: {
+                        title: '총 판매수량',
+                        minValue: 0
+                    },
+                    vAxis: {
+                        title: '카테고리'
+                    }
+                };
+
+                // 그래프를 그려넣을 요소 선택 후 데이터, 옵션을 매개변수로 넣어 그리기
+                var chart = new google.visualization.BarChart(document.getElementById('chart_div1'));
+                chart.draw(data, options);
+            }
+            
+            // ----- 세로막대그래프 그리기 -----
+            google.charts.load('current', {'packages':['bar']});
+            google.charts.setOnLoadCallback(drawBar2);
+
+            function drawBar2() {
+                // 그래프 상에 표현할 데이터
+                var data = google.visualization.arrayToDataTable([
+                    ['월', '매출(원)', '순이익(원)'],
+                    ['1', 1000000, 700000],
+                    ['2', 1170000, 830000],
+                    ['3', 660000, 570000],
+                    ['4', 1030000, 990000],
+                    ['5', 360000, 270000],
+                    ['6', 830000, 790000],
+                    ['7', 1470000, 1250000],
+                    ['8', 860000, 700000],
+                    ['9', 1200000, 1100000],
+                    ['10', 660000, 240000],
+                    ['11', 1720000, 1530000],
+                    ['12', 500000, 488000]
+                ]);
+
+                // 그래프 그리기 옵션
+                var options = {
+                    chart: {
+                        title: '월별 매출 현황',
+                        subtitle: '2023년',
+                    },
+                    bars: 'vertical',
+                    vAxis: {format: 'decimal'},
+                    height: 300,
+                    colors: ['#1b9e77', '#d95f02']
+                };
+
+                // 그래프를 그려넣을 요소 선택 후 데이터, 옵션을 매개변수로 넣어 그리기
+                var chart = new google.charts.Bar(document.getElementById('chart_div2'));
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            }
+
+            // ----- 파이그래프 그리기 -----
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawPie);
+
+            function drawPie() {
+                // 그래프 상에 표현할 데이터
+                var data = google.visualization.arrayToDataTable([
+                    ['회원 등급', '비율'],
+                    ['VIP', 19],
+                    ['GOLD', 28],
+                    ['SILVER', 37],
+                    ['BRONZE', 16]
+                ]);
+
+                // 그래프 그리기 옵션
+                var options = {
+                    title: '회원 등급 현황'
+                };
+
+                // 그래프를 그려넣을 요소 선택 후 데이터, 옵션을 매개변수로 넣어 그리기
+                var chart = new google.visualization.PieChart(document.getElementById('chart_div3'));
+                chart.draw(data, options);
+            }
+
+            // ----- 선그래프 -----
+            google.charts.load('current', {packages: ['corechart', 'line']});
+            google.charts.setOnLoadCallback(drawLine);
+
+            function drawLine() {
+                // 그래프 상에 표현할 데이터
+                var data = google.visualization.arrayToDataTable([
+                    ['월', '거래량', '무료나눔현황'],
+                    ['1월', 130, 30],
+                    ['2월', 321, 50],
+                    ['3월', 288, 63],
+                    ['4월', 90, 142],
+                    ['5월', 317, 96],
+                    ['6월', 246, 25]
+                ]);
+
+                // 그래프 그리기 옵션
+                var options = {
+                    title : '2023년 상반기 거래 현황',
+                    hAxis: {
+                        title: '월'
+                    },
+                    vAxis: {
+                        title: '건'
+                    },
+                    legend: { position: 'bottom' }
+                };
+
+                // 그래프를 그려넣을 요소 선택 후 데이터, 옵션을 매개변수로 넣어 그리기
+                var chart = new google.visualization.LineChart(document.getElementById('chart_div4'));
+                chart.draw(data, options);
+            }
+        };
+    </script>
+    
+</body>
+</html>

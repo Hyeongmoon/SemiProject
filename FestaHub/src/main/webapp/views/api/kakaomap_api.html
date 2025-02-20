@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>카카오맵 사용법</title>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=214a50b68214979974c9cc8888357475"></script> <!-- 카카오맵 api 라이브러리 연동 (cdn) -->
+    <style>
+        .wrap {
+            width : 1200px;
+            margin : auto;
+        }
+        #map { 
+            width : 100%; 
+            height : 400px;
+        }
+        #list { 
+            width : 100%; 
+            border : 1px dotted lightgray;
+            box-sizing : border-box;
+        }
+        ul { line-height : 170%; }
+        li { 
+            margin-bottom : 20px;
+            padding-right : 20px; 
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="wrap">
+        <h1>서울 투어</h1>
+
+        <div id="map"></div>
+        <div id="list"></div>
+    </div>
+
+    <script>
+        // 마커를 표시할 위치에 대한 객체 배열 => 테스트를 위해 전역변수로 셋팅 (서버로부터 json 형식으로 불러올 값들)
+        var positions = [
+            {
+                title: '남산서울타워', 
+                content : "서울특별시 남산에 있는 송신탑이자 서울을 대표하는 랜드마크로서, 정식 명칭은 남산서울타워이며 보통은 남산타워로 불리는 편이다. N서울타워로 불리는 경우도 많다.",
+                latlng: new kakao.maps.LatLng(37.5511694, 126.9882266)
+            },
+            {
+                title: '숭례문', 
+                content : "600년 동안 한양을 둘러싸고 있었던 조선 서울 한양도성의 남쪽에 위치한 문. 현재도 서울의 중심에 위치하고 있으며, 서울의 상징이나 다름 없는 건축물이다.",
+                latlng: new kakao.maps.LatLng(37.559984, 126.9753071)
+            },
+            {
+                title: '리움미술관', 
+                content : "삼성문화재단에서 만든 사립 미술관.",
+                latlng: new kakao.maps.LatLng(37.5378932, 126.9993937)
+            },
+            {
+                title: '전쟁기념관',
+                content : "전쟁기념관은 서울특별시 용산구 이태원로 29(용산동1가)에 위치한 국립 박물관이다.", 
+                latlng: new kakao.maps.LatLng(37.5366059, 126.9771397)
+            },
+            {
+                title: '국립중앙박물관',
+                content : "서울특별시 용산구 용산동6가에 위치한 한국의 대표 국립 박물관. 한국의 고미술, 유물을 중심으로 소장하고 있으며, 소장 유물 약 150만여 점, 상설 전시 유물 1만여 점으로 한국 최대의 박물관이면서 세계적으로도 상당한 규모이다.", 
+                latlng: new kakao.maps.LatLng(37.5238506, 126.9804702)
+            },
+            {
+                title: '남대문시장',
+                content : "서울특별시 중구 회현동 숭례문 앞에 위치해 있는 서울 최대의 재래시장. 서울 지하철 4호선 회현역에서 가깝다.", 
+                latlng: new kakao.maps.LatLng(37.5591786, 126.9776692)
+            },
+            {
+                title: '남산한옥마을',
+                content : "서울특별시 중구 필동 퇴계로에 위치해 있는 한옥 마을. 1998년에 공식 개장하였다. 입장료는 무료이며 매주 월요일은 휴관한다.",
+                latlng: new kakao.maps.LatLng(37.559315, 126.994477)
+            },
+            {
+                title: '덕수궁',
+                content : "조선시대의 궁궐. 현재 서울특별시 중구 세종대로 99 (정동) 서울특별시청 건너편에 위치해 있다.", 
+                latlng: new kakao.maps.LatLng(37.5658049, 126.9751461)
+            },
+            {
+                title: '서울로',
+                content : "서울특별시 중구 만리동1가, 중림동, 봉래동2가, 남대문로5가, 남창동 일대에 걸쳐 있는 공원. 노후한 옛 서울역의 고가차도를 개·보수하여 만들어졌다.", 
+                latlng: new kakao.maps.LatLng(37.5566606, 126.9705394)
+            },
+            {
+                title: 'DDP',
+                content : "서울특별시 중구의 전시장 및 쇼핑몰. 영국의 건축가 자하 하디드가 설계했다. 쇼핑 시설을 겸한 전시장으로 운영하고 있다.", 
+                latlng: new kakao.maps.LatLng(37.5665256, 127.0092236)
+            }
+        ];
+
+        window.onload = function() { // jQuery 사용 시 $(function) 사용 가능
+            // ----- list에 위치 표시하기 -----
+            let list = "<ul>";
+            for (var i = 0; i < positions.length; i ++) {
+                list += "<li>"
+                        + positions[i].title 
+                        + "<br>"
+                        + positions[i].content
+                     + "</li>";
+            }
+            list += "</ul>";
+            document.getElementById("list").innerHTML = list;
+
+            /* 
+                ----- 카카오맵에 위치 표시 및 이벤트 걸기 -----
+                * 공식 사이트 (개발자문서)
+                https://apis.map.kakao.com/web/guide/
+
+                * 주의할점
+                라이브서버로 실행시켜야 함 (html 파일을 그냥 브라우저로 열면 연결이 안됨)
+            */
+            var container = document.getElementById('map');
+            var options = {
+                center: new kakao.maps.LatLng(37.545, 126.986),
+                level: 7
+            };
+
+            // 지도를 생성합니다.
+            var map = new kakao.maps.Map(container, options);
+
+            // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+            var mapTypeControl = new kakao.maps.MapTypeControl();
+
+            // 지도에 컨트롤을 추가해야 지도위에 표시됩니다
+            // kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+            map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+            // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+            var zoomControl = new kakao.maps.ZoomControl();
+            map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+            // 마커 이미지의 이미지 주소입니다
+            var imageSrc = "https://cdn1.iconfinder.com/data/icons/search-engine-optimisation-seo/44/seo_icons-26-1024.png"; 
+                
+            for (var i = 0; i < positions.length; i ++) {
+
+                console.log(positions[i])
+                
+                // 마커 이미지의 이미지 크기 입니다
+                var imageSize = new kakao.maps.Size(24, 24); 
+                
+                // 마커 이미지를 생성합니다    
+                var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize); 
+                
+                // 마커를 생성합니다
+                var marker = new kakao.maps.Marker({
+                    map: map, // 마커를 표시할 지도
+                    position : positions[i].latlng, // 마커를 표시할 위치
+                    title : positions[i].title, // 마커의 타이틀, 마커를 클릭하면 타이틀이 표시됩니다
+                    image : markerImage
+                });
+
+                console.log(marker);
+
+                // 마커를 클릭했을 때 마커 위에 표시할 인포윈도우를 생성합니다
+                var iwContent = '<div style="padding : 5px; width : 250px;">' + positions[i].title + "<hr>" + positions[i].content + '</div>', // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+                    iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+
+                // 인포윈도우를 생성합니다
+                var infowindow = new kakao.maps.InfoWindow({
+                    content : iwContent,
+                    removable : iwRemoveable
+                });
+
+                // 마커에 클릭이벤트를 등록합니다
+                kakao.maps.event.addListener(marker, 'click', clickListener(map, marker, infowindow));
+            }
+        };
+
+        // 클릭이벤트에 대한 이벤트핸들러함수
+        function clickListener(map, marker, infowindow) {
+            return function() {
+                infowindow.open(map, marker);
+            };
+        }
+	</script>
+</body>
+</html>

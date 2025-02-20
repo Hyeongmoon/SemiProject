@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+
+	<!-- 받은 쪽지 총갯수 조회용 쿼리문 -->
+	<entry key="selectReceivedMessageListCount">
+		SELECT COUNT(*) AS "COUNT"
+		  FROM MESSAGE
+		 WHERE RECEIVER_NO = ?
+		   AND RECEIVER_MSG_STATUS = 'Y'
+	</entry>
+	
+	<!-- 받은 쪽지 리스트 조회용 쿼리문 -->
+	<entry key="selecReceivedMessagetList">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+		        SELECT MSG_NO
+		             , MSG_CONTENT
+		             , MSG_DATE
+		             , USER_NICKNAME
+		          FROM MESSAGE
+		          JOIN USER_INFO ON(SENDER_NO = USER_NO)
+		         WHERE RECEIVER_NO = ?
+		           AND RECEIVER_MSG_STATUS = 'Y'
+		         ORDER BY MSG_NO DESC
+		      )A
+		  )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<!-- 보낸 쪽지 총갯수 조회용 쿼리문 -->
+	<entry key="selectSentMessageListCount">
+		SELECT COUNT(*) AS "COUNT"
+		  FROM MESSAGE
+		 WHERE SENDER_NO = ?
+		   AND SENDER_MSG_STATUS = 'Y'
+	</entry>
+	
+	<!-- 보낸 쪽지 목록 조회용 쿼리문 -->
+	<entry key="selecSentMessagetList">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+		        SELECT MSG_NO
+		             , MSG_CONTENT
+		             , MSG_DATE
+		             , USER_NICKNAME
+		          FROM MESSAGE
+		          JOIN USER_INFO ON(RECEIVER_NO = USER_NO)
+		         WHERE SENDER_NO = ?
+		           AND SENDER_MSG_STATUS = 'Y'
+		         ORDER BY MSG_NO DESC
+		      )A
+		  )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<!-- 쪽지 받는사람 닉네임 체크용 쿼리문 -->
+	<entry key="nicknameCheck">
+		SELECT COUNT(*)
+		  FROM USER_INFO
+		 WHERE USER_NICKNAME = ?
+		   AND STATUS = 'Y'
+	</entry>
+	
+	<!-- 쪽지 등록용(발신) 쿼리문 -->
+	<entry key="insertMessage">
+		INSERT INTO MESSAGE(MSG_NO
+		                  , MSG_CONTENT
+		                  , SENDER_NO
+		                  , RECEIVER_NO)
+		            VALUES (SEQ_MSG_NO.NEXTVAL
+		                  , ?
+		                  , ?
+		                  , (
+		                        SELECT USER_NO
+		                          FROM USER_INFO
+		                         WHERE USER_NICKNAME = ?
+		                  ))
+	</entry>
+
+	<!-- 받은 쪽지 상세조회용 쿼리문 -->
+	<entry key="selectReceivedMessage">
+		SELECT MSG_NO
+		     , MSG_CONTENT
+		     , MSG_DATE
+		     , RECEIVER_NO
+		     , USER_NICKNAME
+		  FROM MESSAGE
+		  JOIN USER_INFO ON (SENDER_NO = USER_NO)
+		 WHERE MSG_NO = ?
+		   AND RECEIVER_MSG_STATUS = 'Y'
+	</entry>
+	
+	<!-- 보낸 쪽지 상세조회용 쿼리문 -->
+	<entry key="selectSentMessage">
+		SELECT MSG_NO
+		     , MSG_CONTENT
+		     , MSG_DATE
+		     , SENDER_NO 
+		     , USER_NICKNAME 
+		  FROM MESSAGE
+		  JOIN USER_INFO ON (RECEIVER_NO = USER_NO)
+		 WHERE MSG_NO = ?
+		   AND SENDER_MSG_STATUS = 'Y'
+	</entry>
+	
+	<!-- 받은 쪽지 삭제용 쿼리문 -->
+	<entry key="deleteReceivedMessage">
+		UPDATE MESSAGE
+		   SET RECEIVER_MSG_STATUS = 'N'
+		 WHERE MSG_NO = ?
+		   AND RECEIVER_MSG_STATUS = 'Y'
+	</entry>
+	
+	<!-- 보낸 쪽지 삭제용 쿼리문 -->
+	<entry key="deleteSentMessage">
+		UPDATE MESSAGE
+		   SET SENDER_MSG_STATUS = 'N'
+		 WHERE MSG_NO = ?
+		   AND SENDER_MSG_STATUS = 'Y'
+	</entry>
+	
+	<!-- 받은쪽지 이전글 조회용 쿼리문 -->
+	<entry key="selectPreviousReceivedMessage">
+	<![CDATA[
+		SELECT MSG_NO
+		     , MSG_CONTENT
+		     , MSG_DATE
+		     , RECEIVER_NO 
+		     , USER_NICKNAME 
+		  FROM (
+		    SELECT *
+		      FROM MESSAGE
+		     WHERE MSG_NO < ?
+		       AND RECEIVER_NO = ? 
+		       AND RECEIVER_MSG_STATUS = 'Y'
+		     ORDER BY MSG_NO DESC
+		  )
+		  JOIN USER_INFO ON (SENDER_NO = USER_NO)
+		 WHERE ROWNUM = 1
+	 ]]>
+	</entry>
+	
+	<!-- 받은쪽지 다음글 조회용 쿼리문 -->
+	<entry key="selectNextReceivedMessage">
+		SELECT MSG_NO
+		     , MSG_CONTENT
+		     , MSG_DATE
+		     , RECEIVER_NO 
+		     , USER_NICKNAME 
+		  FROM (
+		    SELECT *
+		      FROM MESSAGE
+		     WHERE MSG_NO > ?
+		       AND RECEIVER_NO = ? 
+		       AND RECEIVER_MSG_STATUS = 'Y'
+		     ORDER BY MSG_NO ASC
+		  )
+		  JOIN USER_INFO ON (SENDER_NO = USER_NO)
+		 WHERE ROWNUM = 1
+	</entry>
+	
+	<!-- 보낸 쪽지 이전글 조회용 쿼리문 -->
+	<entry key="selectPreviousSentMessage">
+	<![CDATA[
+		SELECT MSG_NO
+		     , MSG_CONTENT
+		     , MSG_DATE
+		     , SENDER_NO 
+		     , USER_NICKNAME 
+		  FROM (
+		    SELECT *
+		      FROM MESSAGE
+		     WHERE MSG_NO < ?
+		       AND SENDER_NO = ? 
+		       AND SENDER_MSG_STATUS = 'Y'
+		     ORDER BY MSG_NO DESC
+		  )
+		  JOIN USER_INFO ON (RECEIVER_NO = USER_NO)
+		 WHERE ROWNUM = 1
+	 ]]>
+	</entry>
+	
+	<!-- 보낸 쪽지 다음글 조회용 쿼리문 -->
+	<entry key="selectNextSentMessage">
+		SELECT MSG_NO
+		     , MSG_CONTENT
+		     , MSG_DATE
+		     , SENDER_NO 
+		     , USER_NICKNAME 
+		  FROM (
+		    SELECT *
+		      FROM MESSAGE
+		     WHERE MSG_NO > ?
+		       AND SENDER_NO = ? 
+		       AND SENDER_MSG_STATUS = 'Y'
+		     ORDER BY MSG_NO ASC
+		  )
+		  JOIN USER_INFO ON (RECEIVER_NO = USER_NO)
+		 WHERE ROWNUM = 1
+	</entry>
+
+
+</properties>
+
+
+
+

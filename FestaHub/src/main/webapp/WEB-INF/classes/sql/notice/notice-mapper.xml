@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+
+	<!-- 공지사항게시글 총 갯수 조회용 쿼리문 -->
+	<entry key="selectListCount">
+		SELECT COUNT(*) AS "COUNT"
+		  FROM NOTICE
+		 WHERE NOTICE_STATUS = 'Y'
+	</entry>
+
+	<!-- 공지사항 목록 조회용 쿼리문 -->
+	<entry key="selectList">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+		        SELECT NOTICE_NO
+		             , NOTICE_TITLE
+		             , NOTICE_COUNT
+		             , NOTICE_DATE
+		          FROM NOTICE N
+		         WHERE N.NOTICE_STATUS = 'Y'
+		         ORDER BY NOTICE_NO DESC
+		      ) A
+		  )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+
+	
+	<!-- 공지사항 조회수 증가용 쿼리문 -->
+	<entry key="increaseCount">
+		UPDATE NOTICE
+		   SET NOTICE_COUNT = NOTICE_COUNT + 1
+		 WHERE NOTICE_NO = ?
+		   AND NOTICE_STATUS = 'Y'
+	</entry>
+	
+	<!-- 공지사항 상세조회용 쿼리문 -->
+	<entry key="selectNotice">
+		SELECT NOTICE_NO
+		     , NOTICE_TITLE
+		     , NOTICE_CONTENT
+		     , NOTICE_COUNT
+		     , NOTICE_DATE
+		  FROM NOTICE
+		 WHERE NOTICE_NO = ?
+		   AND NOTICE_STATUS = 'Y'
+	</entry>
+	
+	<!-- 공지사항 작성용 쿼리문 -->
+	<entry key="insertNotice">
+	INSERT INTO NOTICE(NOTICE_NO
+	                 , NOTICE_TITLE
+	                 , NOTICE_CONTENT)
+	            VALUES(SEQ_NOTI_NO.NEXTVAL
+	                 , ?
+	                 , ?)
+	</entry>
+	
+	<!-- 공지사항 삭제용 쿼리문 -->
+	<entry key="deleteNotice">
+	UPDATE NOTICE
+	   SET NOTICE_STATUS = 'N'
+	 WHERE NOTICE_NO = ?
+	   AND NOTICE_STATUS = 'Y'
+	</entry>
+	
+	<!-- 공지사항 수정용 쿼리문 -->
+	<entry key="updateNotice">
+		UPDATE NOTICE
+		   SET NOTICE_TITLE = ?
+		     , NOTICE_CONTENT = ?
+		 WHERE NOTICE_NO = ?
+		   AND NOTICE_STATUS = 'Y'
+	</entry>
+	
+	<!-- 이전 공지사항 조회 쿼리문 -->
+	<entry key="selectPreviousNotice">
+    <![CDATA[
+        SELECT NOTICE_NO
+             , NOTICE_TITLE
+             , NOTICE_CONTENT
+             , NOTICE_COUNT
+             , NOTICE_DATE
+          FROM (
+                SELECT * 
+                  FROM NOTICE 
+                 WHERE NOTICE_NO < ?
+                   AND NOTICE_STATUS = 'Y' 
+                 ORDER BY NOTICE_NO DESC
+               )
+         WHERE ROWNUM = 1
+   	]]>
+	</entry>
+	
+	
+	<!-- 다음 공지사항 조회 쿼리문 -->
+	<entry key="selectNextNotice">
+		SELECT NOTICE_NO
+		     , NOTICE_TITLE
+		     , NOTICE_CONTENT
+		     , NOTICE_COUNT
+		     , NOTICE_DATE
+		  FROM (
+		        SELECT * 
+		          FROM NOTICE 
+		         WHERE NOTICE_NO > ?
+		           AND NOTICE_STATUS = 'Y' 
+		         ORDER BY NOTICE_NO ASC
+		       )
+		 WHERE ROWNUM = 1
+	</entry>
+	
+
+</properties>
+
+
+
+

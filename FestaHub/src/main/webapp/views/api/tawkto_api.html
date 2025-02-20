@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tawk.to 사용법</title>
+</head>
+<body>
+
+    <!-- 
+        * 공식 사이트
+        tawk.to
+
+        * 참고 링크
+        https://manbedded.tistory.com/23
+
+        * 주의할점
+        라이브서버로 실행시켜야 함 (html 파일을 그냥 브라우저로 열면 연결이 안됨)
+    -->
+
+    <div class="step">
+        <div class="stepone">
+            <h4>1. 오른쪽 아래 실시간 채팅 버튼을 눌러주세요.</h4>
+            <img src="resources/image/chat_button.jpg"/>
+        </div>
+        <div class="steptwo">
+            <h4>2. 채팅 시작을 위한 양식을 입력해주세요.</h4>
+            <img src="resources/image/chat_form.jpg"/>
+        </div>
+        <div class="stepthree">
+            <h4>3. 버튼을 눌러 관리자와 채팅을 시작하세요.</h4>
+            <img src="resources/image/chat_start.jpg"/>
+        </div>
+    </div>
+
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='본인계정의주소';
+        s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+        })();
+    </script>
+    <!--End of Tawk.to Script-->
+</body>
+</html>

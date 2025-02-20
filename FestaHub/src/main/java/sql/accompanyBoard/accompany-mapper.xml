@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<!-- 동행구하기 게시글 총 갯수 조회용 쿼리문 -->
+	<entry key="selectListCount">
+		SELECT COUNT(*) AS "COUNT"
+		  FROM ACCOMPANY
+		 WHERE ACCOM_STATUS = 'Y'
+	</entry>
+	
+	<!-- 동행구하기 목록 조회용 쿼리문 -->
+	<entry key="selectList">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM, A.*
+		      FROM (
+		        SELECT AC.ACCOM_NO
+		             , AC.ACCOM_TITLE
+		             , AC.ACCOM_DATE
+		             , AC.ACCOM_COUNT
+		             , UI.USER_NICKNAME
+		             , NVL(LIKE_COUNT, 0) AS LIKE_COUNT
+		          FROM ACCOMPANY AC
+		          JOIN USER_INFO UI
+		            ON AC.USER_NO = UI.USER_NO
+		          LEFT JOIN (
+		            SELECT ACCOM_NO, COUNT(*) AS LIKE_COUNT
+		              FROM ACCOMPANY_LIKE
+		             GROUP BY ACCOM_NO
+		          ) AL
+		            ON AC.ACCOM_NO = AL.ACCOM_NO
+		         WHERE AC.ACCOM_STATUS = 'Y'
+		         ORDER BY AC.ACCOM_NO DESC
+		      ) A
+		  )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<!-- 동행구하기 게시글 등록용 쿼리문 -->
+	<entry key="insertAccompany">
+	INSERT INTO ACCOMPANY(ACCOM_NO
+		                 , ACCOM_TITLE
+		                 , ACCOM_CONTENT
+		                 , USER_NO)
+		            VALUES(SEQ_ACCOM_NO.NEXTVAL
+		                 , ?
+		                 , ?
+		                 , ?)
+	</entry>
+	
+	<!-- 동행구하기 게시글 조회수 증가용 쿼리문 -->
+	<entry key="increaseCount">
+		UPDATE ACCOMPANY
+		   SET ACCOM_COUNT = ACCOM_COUNT + 1
+		 WHERE ACCOM_NO = ?
+		   AND ACCOM_STATUS = 'Y'
+	</entry>
+	
+	<!-- 동행구하기 게시글 상세조회용 쿼리문 -->
+	<entry key="selectAccompany">
+		SELECT AC.ACCOM_NO
+		     , AC.ACCOM_TITLE
+		     , AC.ACCOM_CONTENT
+		     , AC.ACCOM_DATE
+		     , AC.ACCOM_COUNT
+		     , AC.USER_NO
+		     , NVL(AL.LIKE_COUNT, 0) AS LIKE_COUNT
+		     , USER_NICKNAME
+		  FROM ACCOMPANY AC
+		  JOIN USER_INFO UI ON (AC.USER_NO = UI.USER_NO)
+		  LEFT JOIN (
+		    SELECT ACCOM_NO, COUNT(*) AS LIKE_COUNT
+		      FROM ACCOMPANY_LIKE
+		     GROUP BY ACCOM_NO
+		  ) AL
+		    ON AC.ACCOM_NO = AL.ACCOM_NO
+		 WHERE AC.ACCOM_NO = ?
+		   AND AC.ACCOM_STATUS = 'Y'
+	</entry>
+
+	<!-- 동행구하기 게시글 삭제용 쿼리문 -->
+	<entry key="deleteAccompany">
+		UPDATE ACCOMPANY
+		   SET ACCOM_STATUS = 'N'
+		 WHERE ACCOM_NO = ?
+		   AND ACCOM_STATUS = 'Y'
+	</entry>
+	
+	<!-- 동행구하기 게시글 수정용 쿼리문 -->
+	<entry key="updateAccompany">
+		UPDATE ACCOMPANY
+		   SET ACCOM_TITLE = ?
+		     , ACCOM_CONTENT = ?
+		 WHERE ACCOM_NO = ?
+		   AND ACCOM_STATUS = 'Y'
+	</entry>
+	
+	<!-- 동행구하기 게시글 좋아요 정보 조회용 쿼리문 -->
+	<entry key="selectLikeInfo">
+		SELECT COUNT(CASE WHEN USER_NO = ? THEN 1 END) AS "IS_LIKED", 
+		       COUNT(USER_NO) AS "LIKE_COUNT" 
+		  FROM ACCOMPANY_LIKE 
+		 WHERE ACCOM_NO = ?
+	</entry>
+	
+	<!-- 동행구하기 게시글 좋아요 추가용 쿼리문 -->
+	<entry key="likeAccompany">
+		INSERT INTO ACCOMPANY_LIKE(USER_NO
+		                         , ACCOM_NO)
+		                    VALUES(?
+		                         , ?)
+	</entry>
+	
+	<!-- 동행구하기 게시글 좋아요 취소용 쿼리문 -->
+	<entry key="unlikeAccompany">
+		DELETE FROM ACCOMPANY_LIKE
+		 WHERE USER_NO = ?
+		   AND ACCOM_NO = ?
+	</entry>
+
+	<!-- 동행구하기 게시글 이전글 조회용 쿼리문 -->
+	<entry key="selectPreviousAccompany">
+	<![CDATA[
+		SELECT A.*
+		     , UI.USER_NICKNAME
+		     , (SELECT COUNT(*) 
+		          FROM ACCOMPANY_LIKE 
+		         WHERE ACCOM_NO = A.ACCOM_NO) AS "LIKE_COUNT"
+		  FROM (
+		        SELECT * 
+		          FROM ACCOMPANY AC
+		         WHERE AC.ACCOM_NO < ? 
+		           AND AC.ACCOM_STATUS = 'Y' 
+		         ORDER BY AC.ACCOM_NO DESC
+		       )A
+		  JOIN USER_INFO UI ON (A.USER_NO = UI.USER_NO)
+		 WHERE ROWNUM = 1
+	  ]]>
+	</entry>
+
+
+	<!-- 동행구하기 게시글 다음글 조회용 쿼리문 -->
+	<entry key="selectNextAccompany">
+		SELECT A.*
+		     , UI.USER_NICKNAME
+		     , (SELECT COUNT(*) 
+		          FROM ACCOMPANY_LIKE 
+		         WHERE ACCOM_NO = A.ACCOM_NO) AS "LIKE_COUNT"
+		  FROM (
+		        SELECT * 
+		          FROM ACCOMPANY AC
+		         WHERE AC.ACCOM_NO > ? 
+		           AND AC.ACCOM_STATUS = 'Y' 
+		         ORDER BY AC.ACCOM_NO ASC
+		       )A
+		  JOIN USER_INFO UI ON (A.USER_NO = UI.USER_NO)
+		 WHERE ROWNUM = 1
+	</entry>
+
+	
+
+	
+	
+</properties>
+
+
+
+
