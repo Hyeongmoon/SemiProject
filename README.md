@@ -4,7 +4,7 @@ SemiProject : FestaHub
 
 
 <div align= "left">  
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=887272&height=180&text=Filoom&animation=fadeIn&fontColor=000000&fontSize=60" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=887272&height=180&text=FestaHub&animation=fadeIn&fontColor=000000&fontSize=60" />
 </div>
 
 <div align= "left"> 
@@ -37,16 +37,16 @@ SemiProject : FestaHub
   <br><br>
   -
   <br>
-  <img width="20%" src="/selectMovie.PNG"/>
-  <img width="20%" src="/selectDate.PNG"/>
-  <img width="20%" src="/selectSeat.PNG"/>
+  <img width="20%" src=""/>
+  <img width="20%" src=""/>
+  <img width="20%" src=""/>
   <br><br>
-  - 결제
+  - 
   <br>
-  <img width="20%" src="/pay.PNG"/>
-  <img width="20%" src="/paymentResult.PNG"/>
+  <img width="20%" src=""/>
+  <img width="20%" src=""/>
   <br><br>
-  <a href="https://www.canva.com/design/DAGXp-2z_r4/a0Nagt2UYwKxw7aBsm-xYw/edit?utm_content=DAGXp-2z_r4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"> - 전체 UI 보고서 보기 </a>
+  <a href=""> - 전체 UI 보고서 보기 </a>
   <br>
 </div>
 
@@ -66,7 +66,6 @@ SemiProject : FestaHub
     <ul>
         <li>사용자 중심의 편리한 영화 예매</li>
         <li>UI 기획, 설계 및 개선</li>
-        <li>실시간 연동기능 구현</li>
         <li>협업 능력 향상</li>
         <li>API 활용 경험</li>
     </ul>
@@ -74,95 +73,65 @@ SemiProject : FestaHub
 <br>
 
 <h2 style="border-bottom: 1px solid white;">세부기능</h2>
-<div style="display:flex">
-    <div style="border:1px solid red;">
-        <h4>김다훈</h4>
-        <ul>
-            <li>
-                회원 관리 기능
-                <ul>
-                    <li>로그인</li>
-                    <li>로그아웃</li>
-                    <li>아이디, 비밀번호 찾기</li>
-                    <li>회원가입 + 이메일 본인인증(API)</li>
-                </ul>
-            </li>
-            <li>마이페이지
-                <ul>
-                    <li>내 정보 조회</li>
-                    <li>내 정보 수정</li>
-                    <li>회원 탈퇴</li>
-                    <li>비밀번호 바꾸기</li>
-                    <li>나의 예매 내역 조회</li>
-                    <li>좋아요한 영화 조회</li>
-                    <li>나의 리뷰 조회</li>
-                    <li>내 쿠폰 조회</li>
-                    <li>나의 이벤트 조회</li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-    <div style="border:1px solid red;">
-        <h4>정원섭</h4>
-        <ul>
-            <li>
-                영화 관리 기능
-                <ul>
-                    <li>영화 목록 조회</li>
-                    <li>영화 검색(제목 키워드)</li>
-                    <li>필터링(상영여부 / 장르)</li>
-                    <li>정렬(최신순 / 인기순 / 가나나순)</li>
-                    <li>영화 상세조회</li>
-                    <li>질리기(좋아요)</li>
-                    <li>리뷰 목록 조회</li>
-                    <li>리뷰 필터링(실제 관람평만)</li>
-                    <li>리뷰 작성</li>
-                    <li>리뷰 수정</li>
-                    <li>리뷰 삭제</li>
-                </ul>
-            </li>
-        </ul>
-    </div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px;">
+
+  <!-- 김동현 -->
+  <div style="border:1px solid red; padding: 8px;">
+    <h4>김동현</h4>
+    <ul>
+      <li>공연정보: 목록/상세 조회, 검색, 추가/수정/삭제, 찜/찜 해제</li>
+      <li>댓글: 목록, 작성/수정/삭제</li>
+      <li>로그인: 로그인/로그아웃, 아이디/비밀번호 찾기</li>
+    </ul>
+  </div>
+
+  <!-- 권가영 -->
+  <div style="border:1px solid red; padding: 8px;">
+    <h4>권가영</h4>
+    <ul>
+      <li>공연후기: 목록/상세 조회, 검색, 작성/수정/삭제, 좋아요/해제</li>
+      <li>댓글: 목록, 작성/수정/삭제</li>
+    </ul>
+  </div>
+
+  <!-- 김민석 -->
+  <div style="border:1px solid red; padding: 8px;">
+    <h4>김민석</h4>
+    <ul>
+      <li>회원가입: 아이디 중복 확인, 비밀번호 확인</li>
+      <li>마이페이지: 정보 조회/수정, 비밀번호 변경, 회원 탈퇴</li>
+      <li>내 활동: 찜 목록, 게시글/댓글/좋아요 목록</li>
+    </ul>
+  </div>
+
+  <!-- 김형문 -->
+  <div style="border:1px solid red; padding: 8px;">
+    <h4>김형문</h4>
+    <ul>
+      <li>자유게시판: 목록/상세 조회, 검색, 작성/수정/삭제(이미지 포함), 좋아요/해제</li>
+      <li>댓글: 목록, 작성/수정/삭제</li>
+    </ul>
+  </div>
+
+  <!-- 윤홍문 -->
+  <div style="border:1px solid red; padding: 8px;">
+    <h4>윤홍문</h4>
+    <ul>
+      <li>공지사항: 목록/상세 조회, 추가/수정/삭제</li>
+      <li>동행구하기: 목록/상세 조회, 검색, 작성/수정/삭제, 좋아요/해제</li>
+      <li>쪽지: 목록(받은/보낸), 상세조회, 보내기, 삭제</li>
+    </ul>
+  </div>
+
+  <div style="border:1px solid red; padding: 8px;">
+    <h4>관리자페이지</h4>
+    <ul>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </div>
+
 </div>
-<div style="border:1px solid red;">
-<div style="border:1px solid red;">
-<h4>김형문, 박재우</h4>
-<ul>
-    <li>
-        예매 관리 기능
-        <ul>
-            <li>예매 (결제 API)</li>
-            <li>예매 취소</li>
-            <li>예매 내역 상세조회</li>
-        </ul>
-    </li>
-</ul>
-</div>
-<div style="border:1px solid red;">
-<h4>한혜원</h4>
-<ul>
-    <li>
-        공지사항 관리 기능
-        <ul>
-            <li>공지사항 목록 조회</li>
-            <li>공지사항 상세 조회</li>
-        </ul>
-    </li>
-    <li>
-        이벤트 게시판 관리 기능
-        <ul>
-            <li>이벤트 게시판 목록 조회</li>
-            <li>이벤트 게시판 상세 조회</li>
-            <li>댓글 목록 조회</li>
-            <li>댓글 작성</li>
-            <li>댓글 수정</li>
-            <li>댓글 삭제</li>
-            <li>이벤트 목록 필터링</li>
-        </ul>
-    </li>
-    <li>
-        1:1 문의
-    </li>
-</ul>
-</div>
-</div>
+
