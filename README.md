@@ -31,22 +31,45 @@ SemiProject : FestaHub
 
 <h2 style="border-bottom: 1px solid white;"> UI </h2>
 <div>
-  - 메인페이지
+  
+  <h3>메인페이지</h3>
   <br>
-  <img width="20%" src=""/>
+  <img width="60%" src="/screenShotREADME/mainHome.png"/>
   <br><br>
-  -
+
+  <h3>공연정보</h3>
   <br>
-  <img width="20%" src=""/>
-  <img width="20%" src=""/>
-  <img width="20%" src=""/>
-  <br><br>
-  - 
+  <img width="60%" src="/screenShotREADME/festivalList.PNG"/>
   <br>
-  <img width="20%" src=""/>
-  <img width="20%" src=""/>
+  <br>
+  <img width="60%" src="/screenShotREADME/festivalDetail.PNG"/>
   <br><br>
-  <a href=""> - 전체 UI 보고서 보기 </a>
+  <h3>자유게시판</h3>
+  <br>
+  <img width="60%" src="/screenShotREADME/freeboardList.PNG"/>
+  <br>
+  <br>
+  <img width="60%" src="/screenShotREADME/freeboardDetail.PNG"/>
+  <br><br>
+  
+  <br>
+
+  
+  <h3>공지사항</h3>
+
+  <br>
+  <img width="60%" src="/screenShotREADME/notice.PNG"/>
+  
+  <br><br>
+  
+  <h3>관리자페이지</h3>
+    
+  <br>
+  
+  <img width="60%" src="/screenShotREADME/manage.PNG"/>
+  
+  <br><br>
+  <a href="https://docs.google.com/presentation/d/1Hg2SKBx2Fjy89De_YzIKplTyDPXoHZLBlsFIAwEMy_A/edit?usp=drive_link"> - 전체 UI 보고서 보기 </a>
   <br>
 </div>
 
@@ -55,9 +78,9 @@ SemiProject : FestaHub
 <h2 style="border-bottom: 1px solid white;">ERD/다이어그램</h2>
 <div>
     <br>
-    <img width="30%" src="/ERD.PNG"/>
+    <img width="60%" src="/screenShotREADME/erd.PNG"/>
     <br><br>
-    <img width="30%" src="/diagram.PNG/">
+    <img width="60%" src="/screenShotREADME/usecase.PNG/">
 </div>
 
 <br>
@@ -127,9 +150,8 @@ SemiProject : FestaHub
   <div style="border:1px solid red; padding: 8px;">
     <h4>관리자페이지</h4>
     <ul>
-      <li></li>
-      <li></li>
-      <li></li>
+      <li>회원관리</li>
+      <li>게시글관리</li>
     </ul>
   </div>
 
